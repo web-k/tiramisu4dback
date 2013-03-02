@@ -8,7 +8,7 @@ class MessagesController < ApplicationController
   # POST /messages.json
   def create
     @channel = Channel.find(params[:channel_id])
-    @message = @channel.messages.create(params[:message])
+    @message = @channel.messages.create(params.require(:message).permit(:content))
     @message.user_name = session[:user_name] 
 
     respond_to do |format|

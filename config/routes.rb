@@ -4,9 +4,9 @@ Tiramisu::Application.routes.draw do
     resources :messages, only: [:create]
   end
 
-  match 'authentication' => 'authentication#index'
-  match 'authentication/login' => 'authentication#login'
-  match 'authentication/logout' => 'authentication#logout'
+  get 'authentication' => 'authentication#index'
+  post 'authentication/login' => 'authentication#login'
+  get 'authentication/logout' => 'authentication#logout'
 
   post 'pusher/auth' => 'pusher#auth'
   post '/items/:id/event/move' => 'items#move'
