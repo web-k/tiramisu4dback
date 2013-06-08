@@ -12,6 +12,7 @@
       <% @table.items.each do |item| %>
         <img class="draggable" style="position: absolute; top: <%= item.position_y %>px; left: <%= item.position_x %>px;" src="<%= asset_path item.kind+'.gif' %>" data-item-id="<%= item.id %>">
       <% end %>
+      <audio src="/assets/spo_ge_igo_utu01.mp3" id="go_sound" preload="auto"/>
     </div>
     <% else %>
     <%= render 'messages' %>
