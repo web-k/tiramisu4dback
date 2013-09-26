@@ -127,6 +127,7 @@ $(function(){
   }
   check_webkit_notifications();
   if ($('#table_area').size()>0) { initialize_table_upside(); initialize_sound_onoff();}
+  channelname_editor();
 });
 
 
@@ -395,4 +396,22 @@ function remove_member(member_id, member_info) {
       $member.remove();
     }
   });
+}
+
+function channelname_editor(){
+  var $channel_name = $('#channel_name')
+  var $channel_name_edit = $('#channel_name_edit')
+  $channel_name.on('click', function() {
+    $channel_name.css('display', 'none');
+    $channel_name_edit.val($('#channel_name').text());
+    $channel_name_edit.css('display', 'inline');
+    setTimeout(function() {
+      $channel_name_edit.focus();
+    }, 0);
+  });
+  $channel_name_edit.on('blur', function() {
+    $channel_name_edit.css('display', 'none');
+    $channel_name.css('display', 'inline');
+  });
+
 }

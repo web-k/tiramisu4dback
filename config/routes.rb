@@ -10,6 +10,7 @@ Tiramisu::Application.routes.draw do
 
   post 'pusher/auth' => 'pusher#auth'
   post '/items/:id/event/move' => 'items#move'
+  put '/channels/:id/edit' => 'channels#edit'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

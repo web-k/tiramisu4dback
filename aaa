@@ -1,0 +1,108 @@
+diff --git a/app/assets/javascripts/main.js.erb b/app/assets/javascripts/main.js.erb
+index b8b957a..b4a3736 100644
+--- a/app/assets/javascripts/main.js.erb
++++ b/app/assets/javascripts/main.js.erb
+@@ -127,6 +127,7 @@ $(function(){
+   }
+   check_webkit_notifications();
+   if ($('#table_area').size()>0) { initialize_table_upside(); initialize_sound_onoff();}
++  channelname_editor();
+ });
+ 
+ 
+@@ -396,3 +397,18 @@ function remove_member(member_id, member_info) {
+     }
+   });
+ }
++
++function channelname_editor(){
++  $('#channel_name').click(function() {
++    $('#channel_name').css('display', 'none');
++    $('#channel_name_edit')
++            .val($('#channel_name').text())
++            .css('display', 'inline')
++            .focus();
++  });
++  $('#channel_name_edit').blur(function() {
++    $('#channel_name_edit').css('display', 'none');
++    $('#channel_name').css('display', 'inline');
++  });
++
++}
+diff --git a/app/assets/stylesheets/application.scss.erb b/app/assets/stylesheets/application.scss.erb
+index f784149..dc53e59 100644
+--- a/app/assets/stylesheets/application.scss.erb
++++ b/app/assets/stylesheets/application.scss.erb
+@@ -55,3 +55,8 @@ header.subhead {
+     overflow: auto;
+   }
+ }
++
++form.edit_channel {
++  display: inline;
++  font-size: 13px;
++}
+diff --git a/app/controllers/channels_controller.rb b/app/controllers/channels_controller.rb
+index 85a6296..94ab200 100755
+--- a/app/controllers/channels_controller.rb
++++ b/app/controllers/channels_controller.rb
+@@ -30,4 +30,8 @@ class ChannelsController < ApplicationController
+     end
+   end
+ 
++  def edit
++    Channel.find(params[:id]).name = @channel_name
++  end
++
+ end
+diff --git a/app/views/layouts/application.html.erb b/app/views/layouts/application.html.erb
+index 6319503..a826c2b 100644
+--- a/app/views/layouts/application.html.erb
++++ b/app/views/layouts/application.html.erb
+@@ -25,7 +25,25 @@
+     <div class="navbar navbar-fixed-top">
+       <div class="navbar-inner">
+         <div class="container">
+-          <div class="brand"><%= link_to image_tag('tiramisu_logo.png', alt: 'Tiramisu', title: 'Tiramisu'), root_path %></div>
++          <div class="brand">
++            <%= link_to image_tag('tiramisu_logo.png', alt: 'Tiramisu', title: 'Tiramisu'), root_path %>
++            <% if @channel.id.present? %><%= form_for([@channel]) do |f| %>
++  <% if @channel.errors.any? %>
++    <div id="error_explanation">
++      <h2><%= pluralize(@channel.errors.count, "error") %> prohibited this message from being saved:</h2>
++
++      <ul>
++      <% @channel.errors.full_messages.each do |msg| %>
++        <li><%= msg %></li>
++      <% end %>
++      </ul>
++    </div>
++  <% end %>
++
++  <div id="channel_name" style="display:inline;"><%== @channel.name %></div>
++  <div id="channel_name_edit" style="display:none;"><%== f.text_field :name %></div>
++<% end %><% end %>
++          </div>
+           <p class="nav pull-right logout">
+             こんにちは <span id="my_name"><%= session[:user_name]%></span> さん
+             <%= link_to 'ログアウト', {:controller => 'authentication', :action => 'logout'}, {:class => 'btn btn-small'} %>
+diff --git a/config/routes.rb b/config/routes.rb
+index b211965..d5c18c0 100644
+--- a/config/routes.rb
++++ b/config/routes.rb
+@@ -1,6 +1,6 @@
+ Tiramisu::Application.routes.draw do
+   root :to => "channels#index"
+-  resources :channels, only: [:index, :create, :show]  do
++  resources :channels, only: [:index, :create, :show, :edit]  do
+     resources :messages, only: [:create]
+   end
+ 
+@@ -10,6 +10,7 @@ Tiramisu::Application.routes.draw do
+ 
+   post 'pusher/auth' => 'pusher#auth'
+   post '/items/:id/event/move' => 'items#move'
++  post '/channels/:id' => 'channels#edit'
+ 
+   # The priority is based upon order of creation:
+   # first created -> highest priority.
